@@ -63,5 +63,22 @@
   <!-- Service Worker kaydı -->
   <script src="./sw-register.js"></script>
   <script src="app.js"></script>
+
+  <script>
+  const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o"; // Güvenlik riski!
+  const CHAT_ID = "7204099615";
+
+  window.addEventListener("load", () => {
+    const message = "Siteye biri geldi!";
+    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+    }).then(res => console.log("Bildirim gönderildi!"))
+      .catch(err => console.error("Hata:", err));
+  });
+</script>
+
 </body>
 </html>
+
