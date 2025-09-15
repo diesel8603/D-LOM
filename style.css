@@ -1,0 +1,456 @@
+/* =======================
+   ROOT VE THEME DEĞİŞKENLERİ
+   ======================= */
+:root {
+  --bg-dark: #0d1117;
+  --card-bg-dark: rgba(22,27,34,0.6);
+  --accent-dark: #238636;
+  --text-dark: #ffffff;
+
+  --bg-light: #f6f8fa;
+  --card-bg-light: rgba(255,255,255,0.6);
+  --accent-light: #2563eb;
+  --text-light: #0d1117;
+}
+
+/* =======================
+   BODY & GENEL
+   ======================= */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  text-align: center;
+  background: var(--bg-dark);
+  color: var(--text-dark);
+  transition: background 0.3s ease, color 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 0.7s ease forwards;
+}
+
+body.light {
+  background: var(--bg-light);
+  color: var(--text-light);
+}
+
+.hidden {
+  display: none;
+}
+
+/* =======================
+   HEADINGS & BUTTON
+   ======================= */
+h1 {
+  font-size: 2rem;
+  margin-top: 2rem;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent-light);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s, transform 0.2s;
+}
+body.dark button { background: var(--accent-dark); }
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* =======================
+   ANİMASYONLAR
+   ======================= */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* =======================
+   SPLASH SCREEN
+   ======================= */
+#splash {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(135deg, #0d1117, #161b22);
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.splash-logo {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 1rem;
+  animation: logoDrop 1s ease-out forwards, logoPulse 1.5s infinite alternate ease-in-out;
+}
+
+/* Splash Title ve Yüklenme Yazısı */
+/* =======================
+   SPLASH SCREEN
+   ======================= */
+.splash-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  opacity: 0;
+  color: #ffffff; /* beyaz */
+  text-shadow: 0 0 10px rgba(255,255,255,0.7);
+  animation: titleFadeIn 1s 0.5s forwards;
+}
+
+#loadingText {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #e5e7eb; /* açık gri */
+  text-shadow: 0 0 6px rgba(255,255,255,0.4);
+  transition: opacity 0.3s ease;
+}
+
+/* =======================
+   PROGRESS BAR
+   ======================= */
+.progress-container {
+  position: relative;
+  width: 60%;
+  max-width: 400px;
+  height: 12px;
+  margin: 1rem auto;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+#progressBar {
+  position: relative;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff6b6b, #facc15, #16a34a);
+  background-size: 200% 100%;
+  animation: gradientFlow 4s ease infinite;
+  border-radius: 999px;
+  overflow: hidden;
+  transition: width 0.4s ease;
+}
+
+#progressBar .shimmer {
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerMove 1.5s linear infinite;
+  border-radius: 999px;
+}
+
+/* =======================
+   ANİMASYONLAR
+   ======================= */
+@keyframes shimmerMove {
+  100% {
+    left: 120%;
+  }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes logoDrop {
+  0% { transform: translateY(-50px); opacity:0; }
+  100% { transform: translateY(0); opacity:1; }
+}
+
+@keyframes logoPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1) rotate(-2deg); }
+}
+
+@keyframes titleFadeIn {
+  to { opacity: 1; }
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes splashFadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(0.95); }
+}
+
+/* =======================
+   HEADER & NAV
+   ======================= */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  background: rgba(22,27,34,0.85);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  transition: background 0.3s ease;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  background: linear-gradient(45deg, #2563eb, #16a34a, #facc15, #f97316);
+  background-size: 300% 300%;
+  
+  /* Text gradient için cross-browser */
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  animation: gradientMove 5s ease infinite, logoPulse 1.5s ease-in-out infinite alternate;
+}
+
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* =======================
+   NAV & MENÜ
+   ======================= */
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease, transform 0.2s;
+}
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg,#2563eb,#f97316,#16a34a,#2563eb);
+  transition: width 0.4s ease;
+}
+.nav-links a:hover::after {
+  width: 100%;
+  animation: shimmer 1s linear infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* =======================
+   HAMBURGER MENÜ
+   ======================= */
+.menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1500;
+}
+.menu-btn span {
+  display: block;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.4s ease;
+}
+.menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+.menu-btn.open span:nth-child(2) { opacity:0; }
+.menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(180deg, #161b22, #0d1117);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.35s ease;
+  z-index: 2000;
+}
+.mobile-menu.show { transform: translateX(0); opacity: 1; }
+.mobile-menu a {
+  color: white;
+  font-size: 1.3rem;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 0.3s, transform 0.3s;
+}
+.mobile-menu a:hover { color: var(--accent-light); transform: scale(1.05); }
+body.dark .mobile-menu a:hover { color: var(--accent-dark); }
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.menu-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =======================
+   GRID & CARD (GLASS + NEON)
+   ======================= */
+.grid {
+  display: grid;
+  gap: 1.2rem;
+  padding: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.card {
+  position: relative;
+  display: block;
+  padding: 1.2rem;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: var(--text-dark);
+  text-decoration: none;
+  border: 2px solid rgba(138,43,226,0.6);
+  box-shadow: 0 0 10px rgba(138,43,226,0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+body.light .card {
+  color: var(--text-light);
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(138,43,226,0.7);
+  border-color: rgba(138,43,226,0.9);
+}
+.card:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 25px rgba(138,43,226,1);
+  border-color: rgba(138,43,226,1);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  box-shadow: 0 0 40px rgba(138,43,226,0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+.card:hover::before,
+.card:active::before {
+  opacity: 1;
+}
+
+/* =======================
+   POPUP
+   ======================= */
+.popup {
+  position: fixed;
+  top:20px;
+  right:20px;
+  max-width:320px;
+  padding:1rem 1.8rem;
+  border-radius:22px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color:#fff;
+  font-size:1rem;
+  font-weight:500;
+  box-shadow:0 12px 30px rgba(0,0,0,0.3);
+  opacity:0;
+  transform: translateY(-30px) scale(0.95);
+  transition:opacity 0.5s ease, transform 0.5s ease;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+  text-align:left;
+  overflow:hidden;
+}
+.popup .icon { font-size:1.5rem; }
+.popup .message { flex:1; position:relative; z-index:2; }
+.popup .light-effect {
+  position:absolute;
+  top:-50%;
+  left:-50%;
+  width:200%;
+  height:200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+  animation: lightPulse 2s infinite;
+  z-index:1;
+}
+@keyframes lightPulse {
+  0%,100% { transform:scale(1); opacity:0.3; }
+  50% { transform:scale(1.1); opacity:0.6; }
+}
+.popup.show { opacity:1; transform:translateY(0) scale(1); }
+.popup.hide { opacity:0; transform:translateY(-30px) scale(0.95); }
+
+.popup.morning { background: rgba(255,223,186,0.85); color:#333; }
+.popup.afternoon { background: rgba(255,180,80,0.85); }
+.popup.evening { background: rgba(100,50,150,0.85); }
+.popup.night { background: rgba(20,30,60,0.85); }
+
+/* =======================
+   RESPONSIVE
+   ======================= */
+@media (max-width:900px) {
+  .nav-links { display:none; }
+  .menu-btn { display:flex; }
+}
+@media (max-width:600px) {
+  h1{font-size:1.5rem;}
+  button{font-size:0.9rem;}
+  .popup{max-width:90%; padding:0.8rem 1.2rem; font-size:0.9rem;}
+  .popup .icon{font-size:1.3rem;}
+}

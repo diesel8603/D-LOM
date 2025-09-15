@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Tam özellikli PWA örneği">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- iOS uyumluluk -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+  <title>Dilom</title>
+
+  <!-- Manifest ve favicon -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" href="./icons/icon-192.png">
+
+  <!-- Stil -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="dark">
+  <!-- Splash Screen -->
+  <div id="splash" class="splash">
+    <img src="./icons/icon-512.png" alt="logo" class="splash-logo">
+    <h2 class="splash-title">HOŞ GELDİN GÜZELİM </h2>
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar">
+        <div class="shimmer"></div>
+      </div>
+    </div>
+    <p id="loadingText">Yükleniyor...</p>
+  </div>
+
+
+  <!-- Ana İçerik -->
+  <main id="app" class="hidden">
+    <section class="grid">
+      <a href="birthday.html" class="card">
+        <h2>DOĞUM GÜNÜ 🎂 </h2>
+        <p> </p>
+      </a>
+      <a href="" class="card">
+        <h2>ÇOK YAKINDA....</h2>
+        <p></p>
+      </a>
+      <a href="ayarlar.html" class="card">
+        <h2>ÇOK YAKINDA...</h2>
+        <p></p>
+      </a>
+    </section>
+    <button id="installBtn" hidden>📲 Ana Ekrana Ekle</button>
+  </main>
+
+  <!-- Saat Bazlı Popup -->
+  <div id="timePopup" class="popup hidden">
+    <span class="icon"></span>
+    <span class="message"></span>
+    <div class="light-effect"></div>
+  </div>
+
+  <!-- Service Worker kaydı -->
+  <script src="./sw-register.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
