@@ -1,5 +1,5 @@
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw-register.js')
+  navigator.serviceWorker.register('/sw.js')
     .then(reg => {
       console.log('Service Worker kayıtlı:', reg);
       reg.onupdatefound = () => {
@@ -37,3 +37,4 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
