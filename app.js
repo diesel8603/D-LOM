@@ -117,16 +117,16 @@ function showTimePopup() {
   let message = '', className = '';
 
   if (hours >= 6 && hours <= 14) {
-    message = 'Günaydın! Harika bir sabah sizi bekliyor';
+    message = 'Günaydın güzelimm ❤️';
     className = 'morning';
   } else if (hours > 14 && hours <= 18) {
-    message = 'İyi öğleden sonralar!';
+    message = 'Günün, aşık olduğum gülümsemen kadar güzel geçsin ❤️';
     className = 'afternoon';
   } else if (hours > 18 && hours <= 23) {
-    message = 'İyi akşamlar!';
+    message = 'ilaçlarını almayı unutma prensesimm ❤️';
     className = 'evening';
   } else {
-    message = 'Gece sakinliği...';
+    message = 'İyi uykular tatlı rüyalar bitanem ❤️';
     className = 'night';
   }
 
@@ -177,3 +177,4 @@ try {
    DOM READY
    ======================= */
 document.addEventListener('DOMContentLoaded', startSplash);
+
