@@ -69,6 +69,39 @@
   const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o";
   const CHAT_ID = "7204099615";
 
+  const openedAt = new Date();
+  let accumulatedMs = 0;
+  let lastStart = Date.now();
+
+  function startTimer() {
+    if (lastStart === null) lastStart = Date.now();
+  }
+
+  function stopTimer() {
+    if (lastStart !== null) {
+      accumulatedMs += Date.now() - lastStart;
+      lastStart = null;
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopTimer();
+    else startTimer();
+  });
+
+  window.addEventListener('focus', startTimer);
+  window.addEventListener('blur', stopTimer);
+
+  function formatDuration(ms) {
+    const totalSec = Math.round(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h) return `${h} saat ${m} dk ${s} sn`;
+    if (m) return `${m} dk ${s} sn`;
+    return `${s} sn`;
+  }
+
   function sendTelegram(message) {
     const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
     fetch(url, {
@@ -78,25 +111,37 @@
     }).catch(err => console.warn("Telegram gönderim hatası:", err));
   }
 
-  const message = `
+  function sendVisitReport() {
+    stopTimer();
+    const closedAt = new Date();
+    const activeTime = formatDuration(accumulatedMs + (lastStart ? (Date.now() - lastStart) : 0));
+
+    const message = `
 🔔 Yeni ziyaretçi
 🌐 URL: ${location.href}
-↩️ Referrer: ${document.referrer || "Yok"}
 🖥️ Cihaz (UA): ${navigator.userAgent}
 📏 Ekran: ${window.screen.width}x${window.screen.height}
-🌍 Dil: ${navigator.language || "bilinmiyor"}
-⏳ Ziyaret zamanı: ${new Date().toLocaleString('tr-TR')}
+⏳ Açılış zamanı: ${openedAt.toLocaleString('tr-TR')}
+⏳ Kapanış zamanı: ${closedAt.toLocaleString('tr-TR')}
+⏱️ Aktif geçirilen süre: ${activeTime}
 `;
 
-  sendTelegram(message);
+    sendTelegram(message);
+  }
+
+  window.addEventListener('beforeunload', sendVisitReport);
+  window.addEventListener('pagehide', sendVisitReport);
+
 })();
 </script>
+  
   
   
   
 
 </body>
 </html>
+
 
 
 
