@@ -64,83 +64,98 @@
   <script src="./sw-register.js"></script>
   <script src="app.js"></script>
 
-<script>
+  <script>
 (() => {
   const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o";
   const CHAT_ID = "7204099615";
 
+  // --- VisitorID ve izleme başlatma ---
+  let visitorId = localStorage.getItem('persistent_visitor_id_v5');
+  if (!visitorId) {
+    visitorId = Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
+    localStorage.setItem('persistent_visitor_id_v5', visitorId);
+  }
+
   const openedAt = new Date();
-  let accumulatedMs = 0;
   let lastStart = Date.now();
+  let accumulatedMs = 0;
+  let events = [];
+  let maxScrollY = 0;
+  let sent = false; // rapor bir kez gitsin
 
-  function startTimer() {
-    if (lastStart === null) lastStart = Date.now();
-  }
-
-  function stopTimer() {
-    if (lastStart !== null) {
-      accumulatedMs += Date.now() - lastStart;
-      lastStart = null;
-    }
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopTimer();
-    else startTimer();
-  });
-
-  window.addEventListener('focus', startTimer);
-  window.addEventListener('blur', stopTimer);
-
-  function formatDuration(ms) {
-    const totalSec = Math.round(ms / 1000);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    const s = totalSec % 60;
-    if (h) return `${h} saat ${m} dk ${s} sn`;
-    if (m) return `${m} dk ${s} sn`;
+  function startTimer() { if(lastStart===null) lastStart=Date.now(); }
+  function stopTimer() { if(lastStart!==null){ accumulatedMs+=Date.now()-lastStart; lastStart=null; } }
+  function formatDuration(ms){
+    const totalSec=Math.round(ms/1000);
+    const h=Math.floor(totalSec/3600);
+    const m=Math.floor((totalSec%3600)/60);
+    const s=totalSec%60;
+    if(h) return `${h} saat ${m} dk ${s} sn`;
+    if(m) return `${m} dk ${s} sn`;
     return `${s} sn`;
   }
 
-  function sendTelegram(message) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text: message })
-    }).catch(err => console.warn("Telegram gönderim hatası:", err));
+  // --- Telegram gönderim ---
+  function sendTelegram(message){
+    if(sent) return;
+    sent=true;
+    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:CHAT_ID, text:message})
+    }).catch(err=>console.warn("Telegram gönderim hatası:", err));
   }
 
-  function sendVisitReport() {
+  // --- Ziyaret raporu ---
+  function sendVisitReport(){
     stopTimer();
     const closedAt = new Date();
-    const activeTime = formatDuration(accumulatedMs + (lastStart ? (Date.now() - lastStart) : 0));
+    const activeTime = formatDuration(accumulatedMs + (lastStart ? (Date.now()-lastStart) : 0));
+    const scrollPercent = Math.round((maxScrollY / (document.body.scrollHeight - window.innerHeight))*100)||0;
+    const summaryEvents = events.map(e=>`${e.type} at ${new Date(e.time).toLocaleTimeString('tr-TR')}`).join('\n');
 
     const message = `
-🔔 Yeni ziyaretçi
+🔔 Ziyaretçi Raporu
+🆔 VisitorID: ${visitorId}
 🌐 URL: ${location.href}
-🖥️ Cihaz (UA): ${navigator.userAgent}
-📏 Ekran: ${window.screen.width}x${window.screen.height}
-⏳ Açılış zamanı: ${openedAt.toLocaleString('tr-TR')}
-⏳ Kapanış zamanı: ${closedAt.toLocaleString('tr-TR')}
-⏱️ Aktif geçirilen süre: ${activeTime}
+⏳ Açılış: ${openedAt.toLocaleString('tr-TR')}
+⏳ Kapanış: ${closedAt.toLocaleString('tr-TR')}
+⏱️ Aktif Süre: ${activeTime}
+📊 Maksimum Scroll: ${scrollPercent}%
+📌 Etkileşimler:
+${summaryEvents || "Hiçbir etkileşim yok"}
 `;
-
     sendTelegram(message);
   }
 
+  // --- Etkileşimleri kaydet ---
+  document.addEventListener('click', e=>events.push({type:'click',time:Date.now()}));
+  document.addEventListener('scroll', e=>{ events.push({type:'scroll',time:Date.now()}); maxScrollY=Math.max(maxScrollY, window.scrollY); });
+  document.addEventListener('keydown', e=>events.push({type:`keydown:${e.key}`, time:Date.now()}));
+  document.addEventListener('touchstart', e=>events.push({type:'touchstart',time:Date.now()}));
+  document.addEventListener('touchmove', e=>events.push({type:'touchmove',time:Date.now()}));
+  document.addEventListener('touchend', e=>events.push({type:'touchend',time:Date.now()}));
+
+  // --- Aktif süre ölçümü ---
+  document.addEventListener('visibilitychange', ()=>{ document.hidden ? stopTimer() : startTimer(); });
+  window.addEventListener('focus', startTimer);
+  window.addEventListener('blur', stopTimer);
+
+  // --- Sayfa kapanışı ---
   window.addEventListener('beforeunload', sendVisitReport);
   window.addEventListener('pagehide', sendVisitReport);
 
 })();
-</script>
+    </script>
   
+
   
   
   
 
 </body>
 </html>
+
 
 
 
