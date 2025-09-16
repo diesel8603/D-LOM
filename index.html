@@ -71,7 +71,7 @@
   const CHAT_ID = "7204099615";          // kendi chat_id'ni koy
   // ========================
 
-  // --- Kalıcı ID (localStorage) ---
+  // --- Kalıcı VisitorID ---
   function generateVisitorId() {
     return Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
   }
@@ -103,9 +103,9 @@
   }, { passive: true });
   window.addEventListener('focus', startTimer, { passive: true });
   window.addEventListener('blur', stopTimer, { passive: true });
+  window.addEventListener('load', startTimer); // Sayfa yüklenince timer başlat
 
-  if (!document.hidden) startTimer();
-
+  // --- Süre biçimlendirici ---
   function formatDuration(ms) {
     const totalSec = Math.round(ms / 1000);
     const h = Math.floor(totalSec / 3600);
@@ -116,6 +116,7 @@
     return `${s} sn`;
   }
 
+  // --- Mesaj oluşturucu ---
   function buildMessage(closedAt) {
     stopTimer();
     const finalClosed = closedAt || new Date();
@@ -144,25 +145,31 @@
     return lines.join('\n');
   }
 
+  // --- Telegram'a gönderim ---
   function sendToTelegram(text) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-    const payload = JSON.stringify({ chat_id: CHAT_ID, text });
+    const url = `https://api.telegram.org/bot${8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o}/sendMessage`;
+    const payload = JSON.stringify({ chat_id: 7204099615, text });
 
     try {
       const blob = new Blob([payload], { type: 'application/json' });
       if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
-    } catch (e) {}
-    
+    } catch (e) {
+      console.warn('SendBeacon başarısız:', e);
+    }
+
     try {
       fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload,
         keepalive: true
-      }).catch(()=>{});
-    } catch(e){}
+      }).catch((err)=>console.warn('Fetch keepalive başarısız:', err));
+    } catch(e) {
+      console.warn('Fetch keepalive hata:', e);
+    }
   }
 
+  // --- Sayfa kapanış handler ---
   function handleUnload() {
     const closedAt = new Date();
     const msg = buildMessage(closedAt);
@@ -172,13 +179,19 @@
   window.addEventListener('beforeunload', handleUnload, { passive: true });
   window.addEventListener('pagehide', handleUnload, { passive: true });
 
+  // --- Sayfa açılışında kısa bildirim ---
+  sendToTelegram(buildMessage(null));
+
   console.debug('persistent-visit-tracker initialized:', { visitorId, openedAt });
 
 })();
+</script>
+  
   
 
 </body>
 </html>
+
 
 
 
