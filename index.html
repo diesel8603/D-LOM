@@ -69,16 +69,20 @@
   const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o";
   const CHAT_ID = "7204099615";
 
+  const now = new Date();
+  const formattedTime = now.toLocaleString('tr-TR', { hour12: false });
+
   fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: CHAT_ID,
-      text: "🔔 Siteye biri girdi!"
+      text: `🔔 Siteye biri girdi!\n⏳ Ziyaret zamanı: ${formattedTime}`
     })
   }).catch(err => console.warn("Telegram gönderim hatası:", err));
 })();
 </script>
+  
   
   
   
@@ -89,6 +93,7 @@
 
 </body>
 </html>
+
 
 
 
