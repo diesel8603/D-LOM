@@ -66,109 +66,29 @@
 
 <script>
 (() => {
-  // ======= AYARLAR =======
   const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o";
   const CHAT_ID = "7204099615";
-  // ========================
 
-  // --- Kalıcı VisitorID ---
-  function generateVisitorId() {
-    return Math.random().toString(36).slice(2,10) + '-' + Date.now().toString(36);
-  }
-  let visitorId = localStorage.getItem('visit_persistent_id_v1');
-  if (!visitorId) {
-    visitorId = generateVisitorId();
-    localStorage.setItem('visit_persistent_id_v1', visitorId);
-  }
-
-  const openedAt = new Date();
-  let accumulatedMs = 0;
-  let lastStart = null;
-
-  function startTimer() {
-    if (lastStart === null) lastStart = Date.now();
-  }
-  function stopTimer() {
-    if (lastStart !== null) {
-      accumulatedMs += Date.now() - lastStart;
-      lastStart = null;
-    }
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopTimer(); else startTimer();
-  });
-  window.addEventListener('focus', startTimer);
-  window.addEventListener('blur', stopTimer);
-  window.addEventListener('load', startTimer);
-
-  function formatDuration(ms) {
-    const totalSec = Math.round(ms / 1000);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    const s = totalSec % 60;
-    if (h) return `${h} saat ${m} dk ${s} sn`;
-    if (m) return `${m} dk ${s} sn`;
-    return `${s} sn`;
-  }
-
-  function buildMessage(closedAt) {
-    stopTimer();
-    const finalClosed = closedAt || new Date();
-    const totalMs = accumulatedMs + (lastStart ? (Date.now() - lastStart) : 0);
-    const openedUtc = openedAt.toISOString();
-    const closedUtc = finalClosed.toISOString();
-    const openedLocal = openedAt.toLocaleString('tr-TR');
-    const closedLocal = finalClosed.toLocaleString('tr-TR');
-
-    return [
-      "🔔 Yeni ziyaretçi",
-      `🆔 VisitorID: ${visitorId}`,
-      `🌐 URL: ${location.href}`,
-      `↩️ Referrer: ${document.referrer || "Yok"}`,
-      `🖥️ Cihaz (UA): ${navigator.userAgent}`,
-      `📏 Ekran: ${window.screen.width}x${window.screen.height}`,
-      `🌍 Dil: ${navigator.language || "bilinmiyor"}`,
-      `⏳ Açılma (UTC): ${openedUtc}`,
-      `⏳ Açılma (yerel): ${openedLocal}`,
-      `⏳ Kapanış (UTC): ${closedUtc}`,
-      `⏳ Kapanış (yerel): ${closedLocal}`,
-      `⏱️ Aktif geçirilen süre: ${formatDuration(totalMs)}`,
-      `⏰ Rapor zamanı: ${new Date().toLocaleString('tr-TR')}`
-    ].join('\n');
-  }
-
-  function sendToTelegram(text) {
+  function sendTelegram(message) {
     const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-    const payload = JSON.stringify({ chat_id: CHAT_ID, text });
-
-    try {
-      const blob = new Blob([payload], { type: 'application/json' });
-      if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
-    } catch (e) { console.warn('SendBeacon başarısız:', e); }
-
-    try {
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true
-      }).catch(err => console.warn('Fetch keepalive başarısız:', err));
-    } catch(e) { console.warn('Fetch keepalive hata:', e); }
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+    }).catch(err => console.warn("Telegram gönderim hatası:", err));
   }
 
-  function handleUnload() {
-    const msg = buildMessage(new Date());
-    sendToTelegram(msg);
-  }
+  const message = `
+🔔 Yeni ziyaretçi
+🌐 URL: ${location.href}
+↩️ Referrer: ${document.referrer || "Yok"}
+🖥️ Cihaz (UA): ${navigator.userAgent}
+📏 Ekran: ${window.screen.width}x${window.screen.height}
+🌍 Dil: ${navigator.language || "bilinmiyor"}
+⏳ Ziyaret zamanı: ${new Date().toLocaleString('tr-TR')}
+`;
 
-  window.addEventListener('beforeunload', handleUnload);
-  window.addEventListener('pagehide', handleUnload);
-
-  // Sayfa açılışında kısa bildirim
-  sendToTelegram(buildMessage(null));
-
-  console.debug('persistent-visit-tracker initialized:', { visitorId, openedAt });
+  sendTelegram(message);
 })();
 </script>
   
@@ -177,6 +97,7 @@
 
 </body>
 </html>
+
 
 
 
