@@ -67,8 +67,8 @@
 <script>
 (() => {
   // ======= AYARLAR =======
-  const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o"; // kendi tokenini koy
-  const CHAT_ID = "7204099615";          // kendi chat_id'ni koy
+  const TELEGRAM_TOKEN = "8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o";
+  const CHAT_ID = "7204099615";
   // ========================
 
   // --- Kalıcı VisitorID ---
@@ -81,10 +81,7 @@
     localStorage.setItem('visit_persistent_id_v1', visitorId);
   }
 
-  // --- Açılma zamanı ---
   const openedAt = new Date();
-
-  // --- Aktif süre hesaplama ---
   let accumulatedMs = 0;
   let lastStart = null;
 
@@ -100,12 +97,11 @@
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopTimer(); else startTimer();
-  }, { passive: true });
-  window.addEventListener('focus', startTimer, { passive: true });
-  window.addEventListener('blur', stopTimer, { passive: true });
-  window.addEventListener('load', startTimer); // Sayfa yüklenince timer başlat
+  });
+  window.addEventListener('focus', startTimer);
+  window.addEventListener('blur', stopTimer);
+  window.addEventListener('load', startTimer);
 
-  // --- Süre biçimlendirici ---
   function formatDuration(ms) {
     const totalSec = Math.round(ms / 1000);
     const h = Math.floor(totalSec / 3600);
@@ -116,18 +112,16 @@
     return `${s} sn`;
   }
 
-  // --- Mesaj oluşturucu ---
   function buildMessage(closedAt) {
     stopTimer();
     const finalClosed = closedAt || new Date();
     const totalMs = accumulatedMs + (lastStart ? (Date.now() - lastStart) : 0);
-
     const openedUtc = openedAt.toISOString();
     const closedUtc = finalClosed.toISOString();
     const openedLocal = openedAt.toLocaleString('tr-TR');
     const closedLocal = finalClosed.toLocaleString('tr-TR');
 
-    const lines = [
+    return [
       "🔔 Yeni ziyaretçi",
       `🆔 VisitorID: ${visitorId}`,
       `🌐 URL: ${location.href}`,
@@ -141,21 +135,17 @@
       `⏳ Kapanış (yerel): ${closedLocal}`,
       `⏱️ Aktif geçirilen süre: ${formatDuration(totalMs)}`,
       `⏰ Rapor zamanı: ${new Date().toLocaleString('tr-TR')}`
-    ];
-    return lines.join('\n');
+    ].join('\n');
   }
 
-  // --- Telegram'a gönderim ---
   function sendToTelegram(text) {
-    const url = `https://api.telegram.org/bot${8373622440:AAFujCpG291QBJkR3QZ4mLC39SeyPRRiA4o}/sendMessage`;
-    const payload = JSON.stringify({ chat_id: 7204099615, text });
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    const payload = JSON.stringify({ chat_id: CHAT_ID, text });
 
     try {
       const blob = new Blob([payload], { type: 'application/json' });
       if (navigator.sendBeacon && navigator.sendBeacon(url, blob)) return;
-    } catch (e) {
-      console.warn('SendBeacon başarısız:', e);
-    }
+    } catch (e) { console.warn('SendBeacon başarısız:', e); }
 
     try {
       fetch(url, {
@@ -163,34 +153,31 @@
         headers: { 'Content-Type': 'application/json' },
         body: payload,
         keepalive: true
-      }).catch((err)=>console.warn('Fetch keepalive başarısız:', err));
-    } catch(e) {
-      console.warn('Fetch keepalive hata:', e);
-    }
+      }).catch(err => console.warn('Fetch keepalive başarısız:', err));
+    } catch(e) { console.warn('Fetch keepalive hata:', e); }
   }
 
-  // --- Sayfa kapanış handler ---
   function handleUnload() {
-    const closedAt = new Date();
-    const msg = buildMessage(closedAt);
+    const msg = buildMessage(new Date());
     sendToTelegram(msg);
   }
 
-  window.addEventListener('beforeunload', handleUnload, { passive: true });
-  window.addEventListener('pagehide', handleUnload, { passive: true });
+  window.addEventListener('beforeunload', handleUnload);
+  window.addEventListener('pagehide', handleUnload);
 
-  // --- Sayfa açılışında kısa bildirim ---
+  // Sayfa açılışında kısa bildirim
   sendToTelegram(buildMessage(null));
 
   console.debug('persistent-visit-tracker initialized:', { visitorId, openedAt });
-
 })();
 </script>
+  
   
   
 
 </body>
 </html>
+
 
 
 
